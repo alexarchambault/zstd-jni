@@ -248,6 +248,9 @@ jobs:
         - name: Compile
           # -DZSTD_DLL_EXPORT=1 exports the ZSTD_* symbols the FFM code looks up.
           # Keep in step with the Windows branch of jniGccFlags in build.sbt.
+          # The Java_* symbols are exported because src/windows/include comes
+          # before jni on the include path: its jni.h wrapper makes JNIEXPORT
+          # __declspec(dllexport) (see the comment in that file).
           run: /opt/aarch64-w64-mingw32/bin/aarch64-w64-mingw32-clang -shared -D_JNI_IMPLEMENTATION_ -Wl,--kill-at -DZSTD_DLL_EXPORT=1 -O3 -DZSTD_MULTITHREAD=1 -I./src/windows/include -I./jni -I./src/main/native -I./src/main/native/common -std=c99 -o libzstd-jni-$(cat version).dll ./src/main/native/*.c ./src/main/native/common/*.c ./src/main/native/compress/*.c ./src/main/native/decompress/*.[cS] ./src/main/native/dictBuilder/*.c
 
         - name: Deploy
